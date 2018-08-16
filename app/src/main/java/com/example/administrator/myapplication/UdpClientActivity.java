@@ -1,6 +1,5 @@
 package com.example.administrator.myapplication;
 
-import android.content.Context;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
@@ -8,12 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +43,7 @@ public class UdpClientActivity extends AppCompatActivity {
         setContentView(R.layout.activity_udp_client);
 
         //创建自定义UdpSocket类,实现接受，发送信息两个子线程
-        clientSocket = new UdpSocket(this, LOCAL_PORT);
+        clientSocket = new UdpSocket(handler, LOCAL_PORT);
 //        clientSocket.startRecv();   //设置可接受消息
 
         setTalkUI();
@@ -81,7 +77,7 @@ public class UdpClientActivity extends AppCompatActivity {
             public void onClick(View view){
                 //创建线程发送消息
                 String saying = editText_sendMessage.getText().toString();
-                if(saying != null && saying.length() != 0){
+                if(saying.length() != 0){
                     clientSocket.send(saying,
                             serverIP,serverPort);
                 }
@@ -90,6 +86,7 @@ public class UdpClientActivity extends AppCompatActivity {
                 }
             }
         });
+        
     }
 
     // handler用于Activity之间传递消息

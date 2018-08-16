@@ -22,11 +22,13 @@ public class UdpSocket {
     private int localPort = 8600;
     private static int BUF_SIZE = 1500;
     //private RecvThread recvThread = null;
-    private UdpClientActivity activityParent = null;
+//    private UdpClientActivity activityParent = null;
+    private Handler handler;
 
-    UdpSocket(UdpClientActivity parent, int localPort){
-        activityParent = parent;
+
+    UdpSocket(Handler handler, int localPort){
         this.localPort = localPort;
+        this.handler = handler;
     }
 
     //接受外部使用发送接口
@@ -63,25 +65,25 @@ public class UdpSocket {
                 socket.send(packet);
 
                 ////将消息发送给handler以更新界面
-                Message message = activityParent.getHandler().obtainMessage();
+                Message message = handler.obtainMessage();
                 message.what = UdpClientActivity.SEND_MESSAGE_TYPE;
                 message.obj = packet.getData();
-                activityParent.getHandler().sendMessage(message);
+                handler.sendMessage(message);
                 Log.d(TAG, "run: deubg send");
 
                 //接收回复
                 byte[] data = new byte[BUF_SIZE];
                 DatagramPacket packetRecv = new DatagramPacket(data, data.length);
 
-//               后期while 加入处理接收多个回包
+//              后期while 加入处理接收多个回包
                 socket.receive(packetRecv);
                 //更新界面
-                Message messageRecv = activityParent.getHandler().obtainMessage();
+                Message messageRecv = handler.obtainMessage();
                 messageRecv.what = UdpClientActivity.RECV_MESSAGE_TYPE;
                 messageRecv.obj = packetRecv.getData();
                 messageRecv.arg1 = packetRecv.getOffset();
                 messageRecv.arg2 = packetRecv.getLength();
-                activityParent.getHandler().sendMessage(messageRecv);
+                handler.sendMessage(messageRecv);
                 Log.d(TAG, "run: deubg recive");
 
 
@@ -131,12 +133,12 @@ public class UdpSocket {
                 try {
                     socket.receive(packet);
                     //更新界面
-                    Message message = activityParent.getHandler().obtainMessage();
+                    Message message = handler.obtainMessage();
                     message.what = UdpClientActivity.RECV_MESSAGE_TYPE;
                     message.obj = packet.getData();
                     message.arg1 = packet.getOffset();
                     message.arg2 = packet.getLength();
-                    activityParent.getHandler().sendMessage(message);
+                    handler.getHandler().sendMessage(message);
                     Log.d(TAG, "run: deubg recive");
 
                 } catch (IOException e) {

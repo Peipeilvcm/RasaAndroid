@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="16dp"
+    android:orientation="vertical"
+    tools:context="com.example.administrator.myapplication.MainActivity">
+
+    <EditText
+        android:id="@+id/editText_severIP"
+        android:layout_width="232dp"
+        android:layout_height="40dp"
+        android:ems="10"
+        android:hint="ServerIP"
+        android:inputType="text"
+        android:visibility="visible"
+        android:layout_gravity="center"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="52dp" />
+
+    <EditText
+        android:id="@+id/editText_serverPort"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:ems="10"
+        android:hint="Port"
+        android:inputType="number"
+        android:layout_gravity="center"
+        tools:layout_editor_absoluteX="248dp"
+        tools:layout_editor_absoluteY="52dp" />
+
+
+    <Button
+        android:id="@+id/button_setAddr"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:text="自定地址进入" />
+
+    <Button
+        android:id="@+id/button_setDefault"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:text="默认地址进入" />
+
+
+</LinearLayout>

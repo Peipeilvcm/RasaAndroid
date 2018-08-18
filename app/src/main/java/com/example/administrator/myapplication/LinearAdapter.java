@@ -6,8 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -74,6 +72,7 @@ public class LinearAdapter extends RecyclerView.Adapter<LinearAdapter.LinearView
         addItem(getItemCount(), item);
     }
 
+    //内容单元样式
     class LinearViewHolder extends RecyclerView.ViewHolder {
         private TextView textView;
         public LinearViewHolder(View itemView) {

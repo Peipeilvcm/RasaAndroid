@@ -1,8 +1,12 @@
 package com.example.administrator.myapplication;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,15 +21,19 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 public class UdpClientActivity extends AppCompatActivity {
     public static final int RECV_MESSAGE_TYPE = 0x001;
     public static final int SEND_MESSAGE_TYPE = 0x002;
+    public static final int Voice_to_String = 0x003;
     public static final int LOCAL_PORT = 8600;      //本地的端口，接受和发送信息都使用此端口
 
     private EditText editText_sendMessage;
-    private Button button_sendMessage;
+    private Button button_sendMessage;      //发送消息按钮
+    private Button button_voice;
+
 
     //显示对话内容视图
     private RecyclerView recyView_conversation;
@@ -37,17 +45,30 @@ public class UdpClientActivity extends AppCompatActivity {
 
     private UdpSocket clientSocket;
 
+    private VoiceRecognizer voiceRecognizer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_udp_client);
 
+        //初始化权限
+        initPermission();
+        voiceRecognizer = new VoiceRecognizer(this,handler);
+
         //创建自定义UdpSocket类,实现接受，发送信息两个子线程
         clientSocket = new UdpSocket(handler, LOCAL_PORT);
-//        clientSocket.startRecv();   //设置可接受消息
 
         setTalkUI();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //再次对语音识别器处理，避免造成内存泄漏
+        voiceRecognizer.destory();
+    }
+
 
     private void setTalkUI(){
         editText_sendMessage = (EditText) findViewById(R.id.editText_userSaying);
@@ -75,9 +96,9 @@ public class UdpClientActivity extends AppCompatActivity {
         button_sendMessage.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                //创建线程发送消息
                 String saying = editText_sendMessage.getText().toString();
                 if(saying.length() != 0){
+                    //自定义socket发送消息，内部创建线程
                     clientSocket.send(saying,
                             serverIP,serverPort);
                 }
@@ -86,7 +107,14 @@ public class UdpClientActivity extends AppCompatActivity {
                 }
             }
         });
-        
+
+        button_voice = (Button) findViewById(R.id.button_voice);
+        button_voice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                voiceRecognizer.start();
+            }
+        });
     }
 
     // handler用于Activity之间传递消息
@@ -108,6 +136,14 @@ public class UdpClientActivity extends AppCompatActivity {
                     String resMessage=new String(readBuf,msg.arg1,msg.arg2);
                     linearApt.append("Bot: "+resMessage);
                     break;
+
+                case Voice_to_String:       //接受语音
+                    String voiceStr = (String)msg.obj;
+                    clientSocket.send(voiceStr,
+                            serverIP,serverPort);
+                    //editText_sendMessage.setText(voiceStr);
+                    //text_address.setText(voiceStr);
+                    break;
             }
         }
     };
@@ -125,6 +161,7 @@ public class UdpClientActivity extends AppCompatActivity {
         }
     }
 
+    //获取本地IP地址
     public static String getLocalIP() {
         try {
             for (Enumeration<NetworkInterface> enNetI = NetworkInterface
@@ -142,5 +179,32 @@ public class UdpClientActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return "";
+    }
+
+    private void initPermission(){
+        String permissions[] = {
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.INTERNET,
+                Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+
+        ArrayList<String> toApplyList = new ArrayList<>();
+        for(String perm : permissions){
+            if(PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(this,perm)){
+                //没有权限
+                toApplyList.add(perm);
+            }
+        }
+        String tmpList[] = new String[toApplyList.size()];
+        if(!toApplyList.isEmpty()){
+            ActivityCompat.requestPermissions(this,toApplyList.toArray(tmpList),123);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // 此处为android 6.0以上动态授权的回调，用户自行实现。
     }
 }

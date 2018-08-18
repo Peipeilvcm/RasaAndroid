@@ -9,7 +9,7 @@
         android:layout_height="38dp"
         android:text="ServerAddr"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,9 +20,17 @@
         android:orientation="horizontal"
         android:id="@+id/linearLayout">
 
+        <Button
+            android:id="@+id/button_voice"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_gravity="right"
+            android:gravity="center"
+            android:text="语音" />
+
         <EditText
             android:id="@+id/editText_userSaying"
-            android:layout_width="282dp"
+            android:layout_width="232dp"
             android:layout_height="40dp"
 
             android:ems="10"
